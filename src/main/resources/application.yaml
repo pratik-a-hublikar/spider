@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: spider
+  datasource:
+    url: jdbc:mysql://localhost:3306/spider
+    username: root
+    password: Root@1234
+    test-while-idle: true
+    validation-query: SELECT 1
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+jwt:
+  secret: fb1c1e74e7fe4eafbe357427e3ffac947563d55e48054d819a5b860846d1a0bf
+  prefix: Bearer
+  login:
+    ttl: 3600
+  otp:
+    ttl: 300
