@@ -10,27 +10,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EqualsAndHashCode(callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "m_api",
+@Table(name = "m_organisation",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_api_master_uuid", columnNames = "uuid")
+                @UniqueConstraint(name = "uk_org_master_uuid", columnNames = "uuid")
         },
         indexes = {
-                @Index(name = "idx_api_master_uuid", columnList = "uuid")
+                @Index(name = "idx_org_master_uuid", columnList = "uuid")
         })
-public class ApiMaster extends ParentEntity {
-
-    @Column(name = "path")
-    private String path;
-
-    @Column(name = "method")
-    private String method;
+public class OrganisationMaster extends ParentEntity {
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "description")
     private String description;
-
-    @Column(name = "org_id")
-    private Long orgId;
 }

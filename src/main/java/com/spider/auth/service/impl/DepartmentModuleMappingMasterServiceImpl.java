@@ -24,17 +24,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class DepartmentModuleMappingMasterServiceImpl extends ParentServiceImpl<DepartmentModuleMappingMaster,Long> implements DepartmentModuleMappingMasterService {
 
-    @Autowired
-    private DepartmentModuleMappingMasterRepository repository;
-    @Autowired
-    private CriteriaUtil<DepartmentModuleMappingMaster> criteriaUtil;
+    private final DepartmentModuleMappingMasterRepository repository;
+    private final CriteriaUtil<DepartmentModuleMappingMaster> criteriaUtil;
 
 
-    @Autowired
-    private DepartmentMasterRepository departmentMasterRepository;
+    private final DepartmentMasterRepository departmentMasterRepository;
+
+    private final ModuleMasterRepository moduleMasterRepository;
 
     @Autowired
-    private ModuleMasterRepository moduleMasterRepository;
+    public DepartmentModuleMappingMasterServiceImpl(DepartmentModuleMappingMasterRepository repository,
+                                                    CriteriaUtil<DepartmentModuleMappingMaster> criteriaUtil,
+                                                    DepartmentMasterRepository departmentMasterRepository,
+                                                    ModuleMasterRepository moduleMasterRepository) {
+        this.repository = repository;
+        this.criteriaUtil = criteriaUtil;
+        this.departmentMasterRepository = departmentMasterRepository;
+        this.moduleMasterRepository = moduleMasterRepository;
+    }
 
     @Override
     protected ParentRepository<DepartmentModuleMappingMaster, Long> getRepository() {
@@ -49,45 +56,47 @@ public class DepartmentModuleMappingMasterServiceImpl extends ParentServiceImpl<
 
 
     @Override
-    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId) {
+    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId,Long orgId) {
         DepartmentModuleMappingMasterRequest request = objectMapper.convertValue(commonRequest, DepartmentModuleMappingMasterRequest.class);
-        DepartmentMaster department = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId()).orElseThrow(() -> new ValidationException("Department not found"));
-        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(request.getModuleId()).orElseThrow(() -> new ValidationException("Module not found"));
+        DepartmentMaster department = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId(),orgId).orElseThrow(() -> new ValidationException("Department not found"));
+        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(request.getModuleId(),orgId).orElseThrow(() -> new ValidationException("Module not found"));
         DepartmentModuleMappingMaster master = new DepartmentModuleMappingMaster();
         master.setCreatedBy(userId);
         master.setUpdatedBy(userId);
         master.setDepartmentMaster(department);
         master.setModuleMaster(moduleMaster);
+        master.setOrgId(orgId);
         master = getRepository().save(master);
         return CommonPayLoad.of("Successfully Created the API",objectMapper.convertValue(master, DepartmentModuleMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> get(String uuid) {
-        DepartmentModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
+        DepartmentModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         return CommonPayLoad.of("Success",objectMapper.convertValue(master, DepartmentModuleMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId) {
-        DepartmentModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId,Long orgId) {
+        DepartmentModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         if(master == null){
             throw new ValidationException("No Data found!");
         }
 
         DepartmentModuleMappingMasterRequest request = objectMapper.convertValue(commonRequest, DepartmentModuleMappingMasterRequest.class);
-        DepartmentMaster department = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId()).orElseThrow(() -> new ValidationException("Department not found"));
-        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(request.getModuleId()).orElseThrow(() -> new ValidationException("Module not found"));
+        DepartmentMaster department = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId(),orgId).orElseThrow(() -> new ValidationException("Department not found"));
+        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(request.getModuleId(),orgId).orElseThrow(() -> new ValidationException("Module not found"));
         master.setModuleMaster(moduleMaster);
         master.setDepartmentMaster(department);
         master.setUpdatedBy(userId);
+        master.setOrgId(orgId);
         master = getRepository().save(master);
         return CommonPayLoad.of("Successfully Updated the Module Department mappings",objectMapper.convertValue(master, DepartmentModuleMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId) {
-        DepartmentModuleMappingMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
+        DepartmentModuleMappingMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }

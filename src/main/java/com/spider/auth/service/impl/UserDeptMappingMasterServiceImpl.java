@@ -24,16 +24,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserDeptMappingMasterServiceImpl extends ParentServiceImpl<UserDeptMappingMaster,Long> implements UserDeptMappingMasterService {
 
-    @Autowired
-    private UserDeptMappingMasterRepository repository;
-    @Autowired
-    private CriteriaUtil<UserDeptMappingMaster> criteriaUtil;
+    private final UserDeptMappingMasterRepository repository;
+    private final CriteriaUtil<UserDeptMappingMaster> criteriaUtil;
+    private final UserMasterRepository userMasterRepository;
+    private final DepartmentMasterRepository departmentMasterRepository;
 
     @Autowired
-    private UserMasterRepository userMasterRepository;
-
-    @Autowired
-    private DepartmentMasterRepository departmentMasterRepository;
+    public UserDeptMappingMasterServiceImpl(UserDeptMappingMasterRepository repository,
+                                            CriteriaUtil<UserDeptMappingMaster> criteriaUtil,
+                                            UserMasterRepository userMasterRepository,
+                                            DepartmentMasterRepository departmentMasterRepository) {
+        this.repository = repository;
+        this.criteriaUtil = criteriaUtil;
+        this.userMasterRepository = userMasterRepository;
+        this.departmentMasterRepository = departmentMasterRepository;
+    }
 
     @Override
     protected ParentRepository<UserDeptMappingMaster, Long> getRepository() {
@@ -47,49 +52,52 @@ public class UserDeptMappingMasterServiceImpl extends ParentServiceImpl<UserDept
 
 
     @Override
-    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId) {
+    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId,Long orgId) {
         UserDeptMappingMasterRequest request = objectMapper.convertValue(commonRequest, UserDeptMappingMasterRequest.class);
-        UserMaster userMaster = userMasterRepository.findOneActiveByUUIDOptional(request.getUserId()).orElseThrow(() -> new ValidationException("User not found"));
-        DepartmentMaster departmentMaster = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId()).orElseThrow(() -> new ValidationException("Department not found"));
+        UserMaster userMaster = userMasterRepository.findOneActiveByUUIDOptional(request.getUserId(),orgId).orElseThrow(() -> new ValidationException("User not found"));
+        DepartmentMaster departmentMaster = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId(),orgId).orElseThrow(() -> new ValidationException("Department not found"));
         UserDeptMappingMaster master = new UserDeptMappingMaster();
         master.setDepartmentMaster(departmentMaster);
         master.setUserMaster(userMaster);
         master.setCreatedBy(userId);
         master.setUpdatedBy(userId);
+        master.setOrgId(orgId);
         master = getRepository().save(master);
         return CommonPayLoad.of("Successfully Created the Dept Module Relationship",objectMapper.convertValue(master, UserDeptMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> get(String uuid) {
-        UserDeptMappingMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
+        UserDeptMappingMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         return CommonPayLoad.of("Success",objectMapper.convertValue(master, UserDeptMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId) {
-        UserDeptMappingMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId,Long orgId) {
+        UserDeptMappingMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         if(master == null){
             throw new ValidationException("No Data found!");
         }
         UserDeptMappingMasterRequest request = objectMapper.convertValue(commonRequest, UserDeptMappingMasterRequest.class);
-        UserMaster userMaster = userMasterRepository.findOneActiveByUUIDOptional(request.getUserId()).orElseThrow(() -> new ValidationException("User not found"));
-        DepartmentMaster departmentMaster = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId()).orElseThrow(() -> new ValidationException("Department not found"));
+        UserMaster userMaster = userMasterRepository.findOneActiveByUUIDOptional(request.getUserId(),orgId).orElseThrow(() -> new ValidationException("User not found"));
+        DepartmentMaster departmentMaster = departmentMasterRepository.findOneActiveByUUIDOptional(request.getDepartmentId(),orgId).orElseThrow(() -> new ValidationException("Department not found"));
         master.setDepartmentMaster(departmentMaster);
         master.setUserMaster(userMaster);
         master.setUpdatedBy(userId);
+        master.setOrgId(orgId);
         master = getRepository().save(master);
         return CommonPayLoad.of("Successfully Updated the Dept Module Relationship",objectMapper.convertValue(master, UserDeptMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId) {
-        UserDeptMappingMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
+        UserDeptMappingMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }
         oneActiveByUUID.setIsDeleted(true);
         oneActiveByUUID.setUpdatedBy(userId);
+        oneActiveByUUID.setOrgId(orgId);
         oneActiveByUUID = getRepository().save(oneActiveByUUID);
         return CommonPayLoad.of("Successfully Deleted the Dept Module Relationship",objectMapper.convertValue(oneActiveByUUID, UserDeptMappingMasterResponse.class));
     }

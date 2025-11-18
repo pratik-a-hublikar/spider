@@ -19,12 +19,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         })
 public class ApiModuleMappingMaster extends ParentEntity {
 
-//    @Column(name = "api_id",nullable = false)
-//    private Long apiId;
-//
-//    @Column(name = "module_id",nullable = false)
-//    private Long moduleId;
-
     @ManyToOne(cascade = { CascadeType.MERGE })
     @JoinColumn(name = "api_id",referencedColumnName = "id")
     private ApiMaster apiMaster;
@@ -32,4 +26,7 @@ public class ApiModuleMappingMaster extends ParentEntity {
     @ManyToOne(cascade = { CascadeType.MERGE })
     @JoinColumn(name = "module_id",referencedColumnName = "id")
     private ModuleMaster moduleMaster;
+
+    @Column(name = "org_id")
+    private Long orgId;
 }

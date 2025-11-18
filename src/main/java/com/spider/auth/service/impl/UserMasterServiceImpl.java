@@ -58,9 +58,9 @@ public class UserMasterServiceImpl extends ParentServiceImpl<UserMaster,Long> im
 
 
     @Override
-    public boolean hasAuthorization(String uri, String method, String uuid) {
+    public boolean hasAuthorization(String uri, String method, String uuid,Long orgId) {
         log.info("Started validating the user uuid:{} access for URI:{}, method:{}",uuid , uri, method);
-        UserMaster userMaster = repository.findOneActiveByUUID(uuid);
+        UserMaster userMaster = repository.findOneActiveByUUID(uuid,orgId);
         if(null == userMaster){
             return false;
         }
@@ -69,7 +69,9 @@ public class UserMasterServiceImpl extends ParentServiceImpl<UserMaster,Long> im
         }else if(uri.startsWith("/master")){
             return false;
         }
-        Optional<ApiMaster> first = userMaster.getDepartmentMasters().stream()
+        Optional<ApiMaster> first = userMaster.getRoleMasterList().stream()
+                .filter(p -> !CollectionUtils.isEmpty(p.getDepartmentMasters()))
+                .flatMap(p -> p.getDepartmentMasters().stream())
                 .filter(p -> !CollectionUtils.isEmpty(p.getModuleMaster()))
                 .flatMap(p -> p.getModuleMaster().stream())
                 .flatMap(p->p.getApiMasterList().stream())
@@ -88,22 +90,22 @@ public class UserMasterServiceImpl extends ParentServiceImpl<UserMaster,Long> im
         if(userMaster == null ||
                 !passwordEncoder.matches(authRequest.getPassword(),userMaster.getPassword())){
             throw new AuthenticationException(AppConstants.LOGIN_FAILED);}
-        String authToken = jwtTokenUtil.encode(userMaster.getUuid(), AppConstants.LOGIN);
+        String authToken = jwtTokenUtil.encode(userMaster, AppConstants.LOGIN);
         response.setHeader(AppConstants.AUTHORIZATION,authToken);
         return CommonPayLoad.of(AppConstants.LOGIN_SUCCESS);
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> get(String uuid) {
-        UserMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
+        UserMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         return CommonPayLoad.of("Success",objectMapper.convertValue(master, UserMasterResponse.class));
     }
 
 
 
     @Override
-    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId) {
-        UserMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
+        UserMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }

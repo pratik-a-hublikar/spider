@@ -13,20 +13,20 @@ public interface ParentService<D extends ParentEntity,ID>{
     <T extends CommonResponse> CorePage<T> filter(RecordFilter recordFilter, Class<T> clazz);
     Page<D> filter(RecordFilter recordFilter);
 
-    default CommonPayLoad<CommonResponse> create(CommonRequest commonRequest,String userId){
+    default CommonPayLoad<CommonResponse> create(CommonRequest commonRequest,String userId,Long orgId){
         return null;
     }
 
 
-    default CommonPayLoad<CommonResponse> get(String uuid){
+    default CommonPayLoad<CommonResponse> get(String uuid,Long orgId){
         return null;
     }
 
-    default CommonPayLoad<CommonResponse> update(String uuid,CommonRequest commonRequest,String userId){
+    default CommonPayLoad<CommonResponse> update(String uuid,CommonRequest commonRequest,String userId,Long orgId){
         return null;
     }
 
-    default CommonPayLoad<CommonResponse> softDelete(String uuid,String userId){
+    default CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId){
         return null;
     }
 }

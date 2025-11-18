@@ -24,16 +24,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiModuleMappingMasterServiceImpl extends ParentServiceImpl<ApiModuleMappingMaster,Long> implements ApiModuleMappingMasterService {
 
-    @Autowired
-    private ApiModuleMappingMasterRepository repository;
-    @Autowired
-    private CriteriaUtil<ApiModuleMappingMaster> criteriaUtil;
+    private final ApiModuleMappingMasterRepository repository;
+    private final CriteriaUtil<ApiModuleMappingMaster> criteriaUtil;
+
+    private final ApiMasterRepository apiMasterRepository;
+    private final ModuleMasterRepository moduleMasterRepository;
 
     @Autowired
-    private ApiMasterRepository apiMasterRepository;
-    @Autowired
-    private ModuleMasterRepository moduleMasterRepository;
-
+    public ApiModuleMappingMasterServiceImpl(ApiModuleMappingMasterRepository repository,
+                                             CriteriaUtil<ApiModuleMappingMaster> criteriaUtil,
+                                             ApiMasterRepository apiMasterRepository,
+                                             ModuleMasterRepository moduleMasterRepository) {
+        this.repository = repository;
+        this.criteriaUtil = criteriaUtil;
+        this.apiMasterRepository = apiMasterRepository;
+        this.moduleMasterRepository = moduleMasterRepository;
+    }
 
     @Override
     protected ParentRepository<ApiModuleMappingMaster, Long> getRepository() {
@@ -48,36 +54,37 @@ public class ApiModuleMappingMasterServiceImpl extends ParentServiceImpl<ApiModu
 
 
     @Override
-    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId) {
+    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId,Long orgId) {
 
         ApiModuleMappingMasterRequest request = objectMapper.convertValue(commonRequest, ApiModuleMappingMasterRequest.class);
-        ApiMaster apiMaster = apiMasterRepository.findOneActiveByUUIDOptional(request.getApiId()).orElseThrow(() -> new ValidationException("API not found"));
-        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(request.getModuleId()).orElseThrow(() -> new ValidationException("Module not found"));
+        ApiMaster apiMaster = apiMasterRepository.findOneActiveByUUIDOptional(request.getApiId(),orgId).orElseThrow(() -> new ValidationException("API not found"));
+        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(request.getModuleId(),orgId).orElseThrow(() -> new ValidationException("Module not found"));
         ApiModuleMappingMaster master = new ApiModuleMappingMaster();
         master.setApiMaster(apiMaster);
         master.setModuleMaster(moduleMaster);
         master.setCreatedBy(userId);
         master.setUpdatedBy(userId);
+        master.setOrgId(orgId);
         master = getRepository().save(master);
         return CommonPayLoad.of("Successfully Created the API",objectMapper.convertValue(master, ApiModuleMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> get(String uuid) {
-        ApiModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
+        ApiModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         return CommonPayLoad.of("Success",objectMapper.convertValue(master, ApiModuleMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId) {
-        ApiModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId,Long orgId) {
+        ApiModuleMappingMaster master = getRepository().findOneActiveByUUID(uuid,orgId);
         if(master == null){
             throw new ValidationException("No Data found!");
         }
 
         ApiModuleMappingMasterRequest newObj = objectMapper.convertValue(commonRequest, ApiModuleMappingMasterRequest.class);
-        ApiMaster apiMaster = apiMasterRepository.findOneActiveByUUIDOptional(newObj.getApiId()).orElseThrow(() -> new ValidationException("API not found"));
-        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(newObj.getModuleId()).orElseThrow(() -> new ValidationException("Module not found"));
+        ApiMaster apiMaster = apiMasterRepository.findOneActiveByUUIDOptional(newObj.getApiId(),orgId).orElseThrow(() -> new ValidationException("API not found"));
+        ModuleMaster moduleMaster = moduleMasterRepository.findOneActiveByUUIDOptional(newObj.getModuleId(),orgId).orElseThrow(() -> new ValidationException("Module not found"));
         master.setApiMaster(apiMaster);
         master.setModuleMaster(moduleMaster);
         master.setApiMaster(apiMaster);
@@ -88,13 +95,14 @@ public class ApiModuleMappingMasterServiceImpl extends ParentServiceImpl<ApiModu
         master.setCreatedBy(master.getCreatedBy());
         master.setUpdatedBy(userId);
         master.setIsActive(master.getIsActive());
+        master.setOrgId(orgId);
         master = getRepository().save(master);
-        return CommonPayLoad.of("Successfully Updated the API",objectMapper.convertValue(newObj, ApiModuleMappingMasterResponse.class));
+        return CommonPayLoad.of("Successfully Updated the API",objectMapper.convertValue(master, ApiModuleMappingMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId) {
-        ApiModuleMappingMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
+        ApiModuleMappingMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }

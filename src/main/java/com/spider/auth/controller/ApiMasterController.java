@@ -27,29 +27,29 @@ public class ApiMasterController {
     }
 
     @PostMapping()
-    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody ApiMasterRequest apiMasterRequest,@RequestAttribute("userId") String userId) {
+    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody ApiMasterRequest apiMasterRequest,@RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
 
-        CommonPayLoad<CommonResponse> response = apiMasterService.create(apiMasterRequest,userId);
+        CommonPayLoad<CommonResponse> response = apiMasterService.create(apiMasterRequest,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid) {
-        CommonPayLoad<CommonResponse> response = apiMasterService.get(uuid);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = apiMasterService.get(uuid,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{uuid}")
     public ResponseEntity<CommonPayLoad<CommonResponse>> update(@PathVariable("uuid") String uuid,
                                                                 @Valid @RequestBody ApiMasterRequest apiMasterRequest,
-                                                                @RequestAttribute("userId") String userId) {
-        CommonPayLoad<CommonResponse> response = apiMasterService.update(uuid,apiMasterRequest,userId);
+                                                                @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = apiMasterService.update(uuid,apiMasterRequest,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid, @RequestAttribute("userId") String userId) {
-        CommonPayLoad<CommonResponse> response = apiMasterService.softDelete(uuid,userId);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid, @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = apiMasterService.softDelete(uuid,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")

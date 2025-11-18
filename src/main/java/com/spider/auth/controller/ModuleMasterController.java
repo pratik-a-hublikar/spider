@@ -27,27 +27,27 @@ public class ModuleMasterController {
 
     @PostMapping()
     public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody ModuleMasterRequest moduleMasterRequest,
-                                                                @RequestAttribute("userId") String userId) {
-        CommonPayLoad<CommonResponse> response = moduleMasterService.create(moduleMasterRequest,userId);
+                                                                @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = moduleMasterService.create(moduleMasterRequest,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid) {
-        CommonPayLoad<CommonResponse> response = moduleMasterService.get(uuid);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = moduleMasterService.get(uuid,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{uuid}")
     public ResponseEntity<CommonPayLoad<CommonResponse>> update(@PathVariable("uuid") String uuid,
-                                                                @Valid @RequestBody ModuleMasterRequest moduleMasterRequest,@RequestAttribute("userId") String userId) {
-        CommonPayLoad<CommonResponse> response = moduleMasterService.update(uuid,moduleMasterRequest,userId);
+                                                                @Valid @RequestBody ModuleMasterRequest moduleMasterRequest,@RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = moduleMasterService.update(uuid,moduleMasterRequest,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid, @RequestAttribute("userId") String userId) {
-        CommonPayLoad<CommonResponse> response = moduleMasterService.softDelete(uuid,userId);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid, @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = moduleMasterService.softDelete(uuid,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")

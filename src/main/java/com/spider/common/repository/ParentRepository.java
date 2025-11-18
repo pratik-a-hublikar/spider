@@ -14,22 +14,22 @@ import java.util.Optional;
 public interface ParentRepository<T extends ParentEntity,ID> extends JpaRepository<T,ID> {
     Page<T> findAll(Specification<T> specification, Pageable pageRequest);
 
-    default T findOneActiveByUUID(String uuid){
-        return this.findOneByUuidAndIsActiveAndIsDeleted(uuid,true,false);
+    default T findOneActiveByUUID(String uuid,Long orgId){
+        return this.findOneByUuidAndOrgIdAndIsActiveAndIsDeleted(uuid,orgId,true,false);
     }
 
-    default Optional<T> findOneActiveByUUIDOptional(String uuid){
-        return Optional.ofNullable(this.findOneByUuidAndIsActiveAndIsDeleted(uuid,true,false));
+    default Optional<T> findOneActiveByUUIDOptional(String uuid,Long orgId){
+        return Optional.ofNullable(this.findOneByUuidAndOrgIdAndIsActiveAndIsDeleted(uuid,orgId,true,false));
     }
 
 
-    default List<T> getAllActive(String uuid){
-        return this.getAllByUuidAndIsActiveAndIsDeleted(uuid,true,false);
+    default List<T> getAllActive(String uuid,Long orgId){
+        return this.getAllByUuidAndOrgIdAndIsActiveAndIsDeleted(uuid,orgId,true,false);
     }
 
-    List<T> getAllByUuidAndIsActiveAndIsDeleted(String uuid, boolean active, boolean deleted);
+    List<T> getAllByUuidAndOrgIdAndIsActiveAndIsDeleted(String uuid,Long orgId, boolean active, boolean deleted);
 
 
-    T findOneByUuidAndIsActiveAndIsDeleted(String uuid, boolean active, boolean deleted);
+    T findOneByUuidAndOrgIdAndIsActiveAndIsDeleted(String uuid,Long orgId, boolean active, boolean deleted);
 
 }

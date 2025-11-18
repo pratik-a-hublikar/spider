@@ -3,6 +3,7 @@ package com.spider.auth.controller;
 import com.spider.auth.exception.AuthenticationException;
 import com.spider.auth.model.UserMaster;
 import com.spider.auth.request.DepartmentMasterRequest;
+import com.spider.auth.request.UserMasterRequest;
 import com.spider.auth.service.UserMasterService;
 import com.spider.common.AppConstants;
 import com.spider.common.request.filter.RecordFilter;
@@ -27,26 +28,24 @@ public class UserMasterController {
     }
 
     @PostMapping()
-    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody DepartmentMasterRequest request) {
+    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody UserMasterRequest request) {
         throw  new AuthenticationException("API is not ready yet!");
     }
     @PutMapping("/{uuid}")
     public ResponseEntity<CommonPayLoad<CommonResponse>> update(@PathVariable("uuid") String uuid,
-                                                                @Valid @RequestBody DepartmentMasterRequest request) {
+                                                                @Valid @RequestBody UserMasterRequest request) {
         throw  new AuthenticationException("API is not ready yet!");
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid) {
-        CommonPayLoad<CommonResponse> response = service.get(uuid);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = service.get(uuid,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
-
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid, @RequestAttribute("userId") String userId) {
-        CommonPayLoad<CommonResponse> response = service.softDelete(uuid,userId);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid, @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = service.softDelete(uuid,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")

@@ -9,5 +9,6 @@ public class DepartmentMasterRequest extends CommonRequest{
 
     private String departmentName;
     private String description;
+    private Boolean isActive;
 
 }

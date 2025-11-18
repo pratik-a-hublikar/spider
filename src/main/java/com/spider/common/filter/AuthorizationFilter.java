@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -43,11 +44,12 @@ public class AuthorizationFilter  extends BaseFilter {
         String authToken = httpRequest.getHeader(AppConstants.AUTHORIZATION);
         if (authToken != null && authToken.startsWith(jwtTokenUtil.getJwtConfiguration().getPrefix()+" ")) {
             String token = authToken.substring(7);
-            String uuid = jwtTokenUtil.decodeUUID(token);
-            if (StringUtils.hasLength(uuid)) {
-                boolean hasAccess = userMasterService.hasAuthorization(uri,httpRequest.getMethod(),uuid);
+            Pair<String, Long> tokenResponse = jwtTokenUtil.decodeUUID(token);
+            if (tokenResponse != null && StringUtils.hasLength(tokenResponse.getFirst())) {
+                boolean hasAccess = userMasterService.hasAuthorization(uri,httpRequest.getMethod(),tokenResponse.getFirst(),tokenResponse.getSecond());
                 if(hasAccess){
-                    httpRequest.setAttribute("userId",uuid);
+                    httpRequest.setAttribute("userId",tokenResponse.getFirst());
+                    httpRequest.setAttribute("org_id",tokenResponse.getSecond());
                     chain.doFilter(httpRequest, httpResponse);
                 }else{
                     unAuthorizedAccess(httpResponse,"User is not allowed to call the API", HttpStatus.UNAUTHORIZED.value());

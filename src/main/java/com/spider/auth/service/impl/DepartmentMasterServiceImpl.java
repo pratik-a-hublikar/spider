@@ -19,11 +19,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class DepartmentMasterServiceImpl extends ParentServiceImpl<DepartmentMaster,Long> implements DepartmentMasterService {
 
-    @Autowired
-    private DepartmentMasterRepository repository;
-    @Autowired
-    private CriteriaUtil<DepartmentMaster> criteriaUtil;
+    private final DepartmentMasterRepository repository;
+    private final CriteriaUtil<DepartmentMaster> criteriaUtil;
 
+    @Autowired
+    public DepartmentMasterServiceImpl(DepartmentMasterRepository repository,
+                                       CriteriaUtil<DepartmentMaster> criteriaUtil) {
+        this.repository = repository;
+        this.criteriaUtil = criteriaUtil;
+    }
 
     @Override
     protected ParentRepository<DepartmentMaster, Long> getRepository() {
@@ -37,23 +41,24 @@ public class DepartmentMasterServiceImpl extends ParentServiceImpl<DepartmentMas
 
 
     @Override
-    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId) {
+    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId,Long orgId) {
         DepartmentMaster departmentMaster = objectMapper.convertValue(commonRequest, DepartmentMaster.class);
         departmentMaster.setCreatedBy(userId);
         departmentMaster.setUpdatedBy(userId);
+        departmentMaster.setOrgId(orgId);
         departmentMaster = getRepository().save(departmentMaster);
         return CommonPayLoad.of("Successfully Created the Department",objectMapper.convertValue(departmentMaster, DepartmentMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> get(String uuid) {
-        DepartmentMaster departmentMaster = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
+        DepartmentMaster departmentMaster = getRepository().findOneActiveByUUID(uuid,orgId);
         return CommonPayLoad.of("Success",objectMapper.convertValue(departmentMaster, DepartmentMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId) {
-        DepartmentMaster departmentMaster = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId,Long orgId) {
+        DepartmentMaster departmentMaster = getRepository().findOneActiveByUUID(uuid,orgId);
         if(departmentMaster == null){
             throw new ValidationException("No Data found!");
         }
@@ -64,13 +69,14 @@ public class DepartmentMasterServiceImpl extends ParentServiceImpl<DepartmentMas
         newObj.setCreatedBy(departmentMaster.getCreatedBy());
         newObj.setUpdatedBy(userId);
         newObj.setIsActive(departmentMaster.getIsActive());
+        newObj.setOrgId(orgId);
         newObj = getRepository().save(newObj);
         return CommonPayLoad.of("Successfully Updated the Department",objectMapper.convertValue(newObj, DepartmentMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId) {
-        DepartmentMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
+        DepartmentMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }

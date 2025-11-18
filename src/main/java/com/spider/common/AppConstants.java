@@ -26,6 +26,11 @@ public class AppConstants {
     public static final String AUTHORIZATION = "Authorization";
     public static final String MASTER = "/master";
     public static final String API_MASTER = MASTER+"/api";
+    public static final String ROLE_MASTER = MASTER+"/role";
+
+    public static final String ROLE_DEPT_MASTER = MASTER+"/role-dept";
+    public static final String ROLE_USER_MASTER = MASTER+"/user-role";
+
     public static final String API_MODULE_MASTER = MASTER+"/api-module";
 
     public static final String MODULE_MASTER = MASTER+"/module";

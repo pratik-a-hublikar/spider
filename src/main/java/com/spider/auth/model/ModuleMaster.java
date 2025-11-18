@@ -30,6 +30,8 @@ public class ModuleMaster extends ParentEntity {
     @Column(name = "parent_id")
     private Long parentId;
 
+    @Column(name = "org_id")
+    private Long orgId;
 
     @OneToMany(cascade = { CascadeType.MERGE })
     @JoinColumn(name = "parent_id",referencedColumnName = "id",updatable = false,insertable = false)

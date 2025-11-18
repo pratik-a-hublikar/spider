@@ -35,5 +35,7 @@ public class DepartmentMaster extends ParentEntity {
     )
     private List<ModuleMaster> moduleMaster;
 
+    @Column(name = "org_id")
+    private Long orgId;
 
 }

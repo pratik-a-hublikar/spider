@@ -19,11 +19,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
         })
 public class UserDeptMappingMaster extends ParentEntity {
 
-//    @Column(name = "department_id")
-//    private Long departmentId;
-//
-//    @Column(name = "user_id")
-//    private Long userId;
+
+    @Column(name = "org_id")
+    private Long orgId;
 
     @ManyToOne(cascade = { CascadeType.MERGE })
     @JoinColumn(name = "department_id",referencedColumnName = "id")

@@ -1,12 +1,16 @@
 package com.spider.common.utils;
 
+import com.spider.auth.model.UserMaster;
 import com.spider.common.config.JwtConfiguration;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClaims;
+import io.micrometer.core.instrument.step.StepTuple2;
+import jakarta.persistence.Tuple;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -57,27 +61,28 @@ public class JwtTokenUtil implements Serializable {
             return false;
         }
     }
-    public String decodeUUID(String token) throws ExpiredJwtException {
+    public Pair<String,Long> decodeUUID(String token) throws ExpiredJwtException {
         try {
             DefaultClaims body = fetchDefaultClaims(token);
-            return (String) body.get("uuid");
+            return Pair.of((String) body.get("uuid"),(Long) body.get("org_id"));
         } catch (Exception e) {
             return null;
         }
     }
-    public String encode(String uuid, String tokenType) {
+    public String encode(UserMaster userMaster, String tokenType) {
         if ("LOGIN".equals(tokenType)) {
-            return doGenerateToken(uuid, tokenType, jwtConfiguration.getLoginTTL());
+            return doGenerateToken(userMaster, tokenType, jwtConfiguration.getLoginTTL());
         }else {
             throw new RuntimeException("Token Type is not valid");
         }
     }
-    private String doGenerateToken(String uuid, String subject, long ttl) {
+    private String doGenerateToken(UserMaster userMaster, String subject, long ttl) {
         log.info(jwtConfiguration.getSecret());
         Key key = getKey();
         Instant now = Instant.now();
         String jwtToken = Jwts.builder()
-                .claim("uuid", uuid)
+                .claim("uuid", userMaster.getUuid())
+                .claim("org_id",userMaster.getOrgId())
                 .setSubject(subject)
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(Date.from(now))

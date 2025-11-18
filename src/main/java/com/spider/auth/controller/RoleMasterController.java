@@ -1,8 +1,9 @@
 package com.spider.auth.controller;
 
-import com.spider.auth.model.RoleDepartmentMappingMaster;
-import com.spider.auth.request.RoleDeptMappingMasterRequest;
-import com.spider.auth.service.RoleDepartmentMappingMasterService;
+import com.spider.auth.model.RoleMaster;
+import com.spider.auth.request.ApiMasterRequest;
+import com.spider.auth.request.RoleMasterRequest;
+import com.spider.auth.service.RoleMasterService;
 import com.spider.common.AppConstants;
 import com.spider.common.request.filter.RecordFilter;
 import com.spider.common.response.CommonPayLoad;
@@ -15,36 +16,37 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(AppConstants.USER_DEPT_MASTER)
-public class UserDeptMappingMasterController {
+@RequestMapping(AppConstants.ROLE_MASTER)
+public class RoleMasterController {
 
-    private final RoleDepartmentMappingMasterService service;
+
+    private final RoleMasterService roleMasterService;
 
     @Autowired
-    public UserDeptMappingMasterController(RoleDepartmentMappingMasterService service) {
-        this.service = service;
+    public RoleMasterController(RoleMasterService roleMasterService) {
+        this.roleMasterService = roleMasterService;
     }
 
     @PostMapping()
-    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody RoleDeptMappingMasterRequest request,
+    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody RoleMasterRequest request,
                                                                 @RequestAttribute("userId") String userId,
                                                                 @RequestAttribute("orgId") Long orgId) {
-        CommonPayLoad<CommonResponse> response = service.create(request,userId,orgId);
+
+        CommonPayLoad<CommonResponse> response = roleMasterService.create(request,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid,
-                                                             @RequestAttribute("orgId") Long orgId) {
-        CommonPayLoad<CommonResponse> response = service.get(uuid,orgId);
+    public ResponseEntity<CommonPayLoad<CommonResponse>> get(@PathVariable("uuid") String uuid,@RequestAttribute("orgId") Long orgId) {
+        CommonPayLoad<CommonResponse> response = roleMasterService.get(uuid,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("/{uuid}")
     public ResponseEntity<CommonPayLoad<CommonResponse>> update(@PathVariable("uuid") String uuid,
-                                                                @Valid @RequestBody RoleDeptMappingMasterRequest request,
+                                                                @Valid @RequestBody RoleMasterRequest request,
                                                                 @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
-        CommonPayLoad<CommonResponse> response = service.update(uuid,request,userId,orgId);
+        CommonPayLoad<CommonResponse> response = roleMasterService.update(uuid,request,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -52,12 +54,12 @@ public class UserDeptMappingMasterController {
     public ResponseEntity<CommonPayLoad<CommonResponse>> softDelete(@PathVariable("uuid") String uuid,
                                                                     @RequestAttribute("userId") String userId,
                                                                     @RequestAttribute("orgId") Long orgId) {
-        CommonPayLoad<CommonResponse> response = service.softDelete(uuid,userId,orgId);
+        CommonPayLoad<CommonResponse> response = roleMasterService.softDelete(uuid,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")
-    public ResponseEntity<Page<RoleDepartmentMappingMaster>> filter(@Valid @RequestBody RecordFilter recordFilter) {
-        Page<RoleDepartmentMappingMaster> filter = service.filter(recordFilter);
+    public ResponseEntity<Page<RoleMaster>> filter(@Valid @RequestBody RecordFilter recordFilter) {
+        Page<RoleMaster> filter = roleMasterService.filter(recordFilter);
         return new ResponseEntity<>(filter, HttpStatus.OK);
     }
 

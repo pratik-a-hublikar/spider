@@ -22,6 +22,9 @@ import java.util.List;
 public class UserMaster extends ParentEntity {
 
 
+    @Column(name = "org_id")
+    private Long orgId;
+
     @Column(name = "email",nullable = false)
     private String email;
 
@@ -33,9 +36,10 @@ public class UserMaster extends ParentEntity {
 
     @ManyToMany( fetch = FetchType.EAGER)
     @JoinTable(
-            name = "m_user_dept_mapping",
-            joinColumns = @JoinColumn(name = "user_id"),
+            name = "m_role_dept_mapping",
+            joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "department_id")
     )
-    private List<DepartmentMaster> departmentMasters;
+    private List<RoleMaster> roleMasterList;
+
 }

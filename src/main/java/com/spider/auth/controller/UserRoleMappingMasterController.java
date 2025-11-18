@@ -1,8 +1,8 @@
 package com.spider.auth.controller;
 
-import com.spider.auth.model.RoleDepartmentMappingMaster;
-import com.spider.auth.request.RoleDeptMappingMasterRequest;
-import com.spider.auth.service.RoleDepartmentMappingMasterService;
+import com.spider.auth.model.UserRoleMappingMaster;
+import com.spider.auth.request.UserRoleMappingMasterRequest;
+import com.spider.auth.service.UserRoleMappingMasterService;
 import com.spider.common.AppConstants;
 import com.spider.common.request.filter.RecordFilter;
 import com.spider.common.response.CommonPayLoad;
@@ -15,18 +15,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(AppConstants.USER_DEPT_MASTER)
-public class UserDeptMappingMasterController {
+@RequestMapping(AppConstants.ROLE_USER_MASTER)
+public class UserRoleMappingMasterController {
 
-    private final RoleDepartmentMappingMasterService service;
+    private final UserRoleMappingMasterService service;
 
     @Autowired
-    public UserDeptMappingMasterController(RoleDepartmentMappingMasterService service) {
+    public UserRoleMappingMasterController(UserRoleMappingMasterService service) {
         this.service = service;
     }
 
     @PostMapping()
-    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody RoleDeptMappingMasterRequest request,
+    public ResponseEntity<CommonPayLoad<CommonResponse>> create(@Valid @RequestBody UserRoleMappingMasterRequest request,
                                                                 @RequestAttribute("userId") String userId,
                                                                 @RequestAttribute("orgId") Long orgId) {
         CommonPayLoad<CommonResponse> response = service.create(request,userId,orgId);
@@ -42,8 +42,9 @@ public class UserDeptMappingMasterController {
 
     @PutMapping("/{uuid}")
     public ResponseEntity<CommonPayLoad<CommonResponse>> update(@PathVariable("uuid") String uuid,
-                                                                @Valid @RequestBody RoleDeptMappingMasterRequest request,
-                                                                @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
+                                                                @Valid @RequestBody UserRoleMappingMasterRequest request,
+                                                                @RequestAttribute("userId") String userId,
+                                                                @RequestAttribute("orgId") Long orgId) {
         CommonPayLoad<CommonResponse> response = service.update(uuid,request,userId,orgId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -56,8 +57,8 @@ public class UserDeptMappingMasterController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")
-    public ResponseEntity<Page<RoleDepartmentMappingMaster>> filter(@Valid @RequestBody RecordFilter recordFilter) {
-        Page<RoleDepartmentMappingMaster> filter = service.filter(recordFilter);
+    public ResponseEntity<Page<UserRoleMappingMaster>> filter(@Valid @RequestBody RecordFilter recordFilter) {
+        Page<UserRoleMappingMaster> filter = service.filter(recordFilter);
         return new ResponseEntity<>(filter, HttpStatus.OK);
     }
 

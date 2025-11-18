@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public interface UserMasterService extends ParentService<UserMaster,Long> {
 
-    boolean hasAuthorization(String uri, String method, String uuid);
+    boolean hasAuthorization(String uri, String method, String uuid,Long orgId);
 
 
     CommonPayLoad<String> validateCredentials(AuthRequest authRequest, HttpServletResponse response);

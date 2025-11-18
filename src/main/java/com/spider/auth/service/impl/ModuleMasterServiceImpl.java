@@ -20,11 +20,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class ModuleMasterServiceImpl extends ParentServiceImpl<ModuleMaster,Long> implements ModuleMasterService {
 
-    @Autowired
-    private ModuleMasterRepository repository;
-    @Autowired
-    private CriteriaUtil<ModuleMaster> criteriaUtil;
+    private final ModuleMasterRepository repository;
+    private final CriteriaUtil<ModuleMaster> criteriaUtil;
 
+    @Autowired
+    public ModuleMasterServiceImpl(ModuleMasterRepository repository,
+                                   CriteriaUtil<ModuleMaster> criteriaUtil) {
+        this.repository = repository;
+        this.criteriaUtil = criteriaUtil;
+    }
 
     @Override
     protected ParentRepository<ModuleMaster, Long> getRepository() {
@@ -37,42 +41,44 @@ public class ModuleMasterServiceImpl extends ParentServiceImpl<ModuleMaster,Long
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest,String userId) {
+    public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest,String userId,Long orgId) {
         ModuleMasterRequest newObj = objectMapper.convertValue(commonRequest, ModuleMasterRequest.class);
-        ModuleMaster parentModule = getRepository().findOneActiveByUUIDOptional(newObj.getParentId()).orElseThrow(() -> new ValidationException("Parent module not found"));
+        ModuleMaster parentModule = getRepository().findOneActiveByUUIDOptional(newObj.getParentId(),orgId).orElseThrow(() -> new ValidationException("Parent module not found"));
         ModuleMaster moduleMaster = new ModuleMaster();
         moduleMaster.setModuleName(newObj.getModuleName());
         moduleMaster.setDescription(newObj.getDescription());
         moduleMaster.setParentId(parentModule.getId());
         moduleMaster.setCreatedBy(userId);
         moduleMaster.setUpdatedBy(userId);
+        moduleMaster.setOrgId(orgId);
         moduleMaster = getRepository().save(moduleMaster);
         return CommonPayLoad.of("Successfully Created the module",objectMapper.convertValue(moduleMaster, ModuleMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> get(String uuid) {
-        ModuleMaster moduleMaster = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
+        ModuleMaster moduleMaster = getRepository().findOneActiveByUUID(uuid,orgId);
         return CommonPayLoad.of("Success",objectMapper.convertValue(moduleMaster, ModuleMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId) {
-        ModuleMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId,Long orgId) {
+        ModuleMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }
         ModuleMasterRequest newObj = objectMapper.convertValue(commonRequest, ModuleMasterRequest.class);
-        ModuleMaster moduleMaster = getRepository().findOneActiveByUUIDOptional(newObj.getParentId()).orElseThrow(() -> new ValidationException("Parent module not found"));
-        oneActiveByUUID.setUpdatedBy(uuid);
+        ModuleMaster moduleMaster = getRepository().findOneActiveByUUIDOptional(newObj.getParentId(),orgId).orElseThrow(() -> new ValidationException("Parent module not found"));
+        oneActiveByUUID.setUpdatedBy(userId);
+        oneActiveByUUID.setOrgId(orgId);
         oneActiveByUUID.setParentId(moduleMaster.getId());
         oneActiveByUUID = getRepository().save(oneActiveByUUID);
         return CommonPayLoad.of("Successfully Updated the module",objectMapper.convertValue(oneActiveByUUID, ModuleMasterResponse.class));
     }
 
     @Override
-    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId) {
-        ModuleMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid);
+    public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
+        ModuleMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }

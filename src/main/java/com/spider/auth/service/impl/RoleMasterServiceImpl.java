@@ -1,10 +1,10 @@
 package com.spider.auth.service.impl;
 
-import com.spider.auth.model.ApiMaster;
-import com.spider.auth.repository.ApiMasterRepository;
+import com.spider.auth.model.RoleMaster;
+import com.spider.auth.repository.RoleMasterRepository;
 import com.spider.auth.request.CommonRequest;
-import com.spider.auth.response.ApiMasterResponse;
-import com.spider.auth.service.ApiMasterService;
+import com.spider.auth.response.RoleMasterResponse;
+import com.spider.auth.service.RoleMasterService;
 import com.spider.common.exception.ValidationException;
 import com.spider.common.repository.ParentRepository;
 import com.spider.common.response.CommonPayLoad;
@@ -17,72 +17,72 @@ import org.springframework.stereotype.Service;
 
 @Log4j2
 @Service
-public class ApiMasterServiceImpl extends ParentServiceImpl<ApiMaster,Long> implements ApiMasterService {
+public class RoleMasterServiceImpl extends ParentServiceImpl<RoleMaster,Long> implements RoleMasterService {
 
-    private final ApiMasterRepository repository;
-    private final CriteriaUtil<ApiMaster> criteriaUtil;
-
+    private final RoleMasterRepository repository;
+    private final CriteriaUtil<RoleMaster> criteriaUtil;
     @Autowired
-    public ApiMasterServiceImpl(ApiMasterRepository repository, CriteriaUtil<ApiMaster> criteriaUtil) {
+    public RoleMasterServiceImpl(RoleMasterRepository repository,
+                                 CriteriaUtil<RoleMaster> criteriaUtil) {
         this.repository = repository;
         this.criteriaUtil = criteriaUtil;
     }
 
     @Override
-    protected ParentRepository<ApiMaster, Long> getRepository() {
+    protected ParentRepository<RoleMaster, Long> getRepository() {
         return repository;
     }
 
     @Override
-    protected CriteriaUtil<ApiMaster> getCriteriaUtil() {
+    protected CriteriaUtil<RoleMaster> getCriteriaUtil() {
         return criteriaUtil;
     }
 
 
     @Override
     public CommonPayLoad<CommonResponse> create(CommonRequest commonRequest, String userId,Long orgId) {
-        ApiMaster apiMaster = objectMapper.convertValue(commonRequest, ApiMaster.class);
+        RoleMaster apiMaster = objectMapper.convertValue(commonRequest, RoleMaster.class);
         apiMaster.setCreatedBy(userId);
         apiMaster.setUpdatedBy(userId);
         apiMaster.setOrgId(orgId);
         apiMaster = getRepository().save(apiMaster);
-        return CommonPayLoad.of("Successfully Created the API",objectMapper.convertValue(apiMaster, ApiMasterResponse.class));
+        return CommonPayLoad.of("Successfully Created the Role",objectMapper.convertValue(apiMaster, RoleMasterResponse.class));
     }
 
     @Override
     public CommonPayLoad<CommonResponse> get(String uuid,Long orgId) {
-        ApiMaster apiMaster = getRepository().findOneActiveByUUID(uuid,orgId);
-        return CommonPayLoad.of("Success",objectMapper.convertValue(apiMaster, ApiMasterResponse.class));
+        RoleMaster roleMaster = getRepository().findOneActiveByUUID(uuid,orgId);
+        return CommonPayLoad.of("Success",objectMapper.convertValue(roleMaster, RoleMasterResponse.class));
     }
 
     @Override
     public CommonPayLoad<CommonResponse> update(String uuid, CommonRequest commonRequest, String userId,Long orgId) {
-        ApiMaster apiMaster = getRepository().findOneActiveByUUID(uuid,orgId);
-        if(apiMaster == null){
+        RoleMaster roleMaster = getRepository().findOneActiveByUUID(uuid,orgId);
+        if(roleMaster == null){
             throw new ValidationException("No Data found!");
         }
-        ApiMaster newObj = objectMapper.convertValue(commonRequest, ApiMaster.class);
+        RoleMaster newObj = objectMapper.convertValue(commonRequest, RoleMaster.class);
         newObj.setUuid(uuid);
-        newObj.setId(apiMaster.getId());
-        newObj.setCreatedAt(apiMaster.getCreatedAt());
-        newObj.setCreatedBy(apiMaster.getCreatedBy());
+        newObj.setId(roleMaster.getId());
+        newObj.setCreatedAt(roleMaster.getCreatedAt());
+        newObj.setCreatedBy(roleMaster.getCreatedBy());
         newObj.setUpdatedBy(userId);
-        newObj.setIsActive(apiMaster.getIsActive());
+        newObj.setIsActive(roleMaster.getIsActive());
         newObj.setOrgId(orgId);
         newObj = getRepository().save(newObj);
-        return CommonPayLoad.of("Successfully Updated the API",objectMapper.convertValue(newObj, ApiMasterResponse.class));
+        return CommonPayLoad.of("Successfully Updated the Role",objectMapper.convertValue(newObj, RoleMasterResponse.class));
     }
 
     @Override
     public CommonPayLoad<CommonResponse> softDelete(String uuid,String userId,Long orgId) {
-        ApiMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
+        RoleMaster oneActiveByUUID = getRepository().findOneActiveByUUID(uuid,orgId);
         if(oneActiveByUUID == null){
             throw new ValidationException("No Data found!");
         }
         oneActiveByUUID.setIsDeleted(true);
         oneActiveByUUID.setUpdatedBy(userId);
         oneActiveByUUID = getRepository().save(oneActiveByUUID);
-        return CommonPayLoad.of("Successfully Deleted the API",objectMapper.convertValue(oneActiveByUUID, ApiMasterResponse.class));
+        return CommonPayLoad.of("Successfully Deleted the Role",objectMapper.convertValue(oneActiveByUUID, RoleMasterResponse.class));
     }
 
 

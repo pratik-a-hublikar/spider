@@ -1,29 +1,27 @@
 package com.spider.auth.model;
 
+
 import com.spider.common.model.ParentEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
+
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "m_api",
+@Table(name = "m_role",
         uniqueConstraints = {
-                @UniqueConstraint(name = "uk_api_master_uuid", columnNames = "uuid")
+                @UniqueConstraint(name = "uk_role_master_uuid", columnNames = "uuid")
         },
         indexes = {
-                @Index(name = "idx_api_master_uuid", columnList = "uuid")
+                @Index(name = "idx_role_master_uuid", columnList = "uuid")
         })
-public class ApiMaster extends ParentEntity {
+public class RoleMaster extends ParentEntity {
 
-    @Column(name = "path")
-    private String path;
-
-    @Column(name = "method")
-    private String method;
 
     @Column(name = "name")
     private String name;
@@ -33,4 +31,15 @@ public class ApiMaster extends ParentEntity {
 
     @Column(name = "org_id")
     private Long orgId;
+
+    @ManyToMany( fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "m_role_dept_mapping",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "department_id")
+    )
+    private List<DepartmentMaster> departmentMasters;
+
+
+
 }
