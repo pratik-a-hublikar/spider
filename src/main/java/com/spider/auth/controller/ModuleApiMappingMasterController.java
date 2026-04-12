@@ -1,8 +1,9 @@
 package com.spider.auth.controller;
 
-import com.spider.auth.model.ApiModuleMappingMaster;
+import com.spider.auth.exception.AuthenticationException;
+import com.spider.auth.model.view.ModuleAPIMappingView;
 import com.spider.auth.request.ApiModuleMappingMasterRequest;
-import com.spider.auth.service.ApiModuleMappingMasterService;
+import com.spider.auth.service.ModuleAPIMappingViewService;
 import com.spider.common.AppConstants;
 import com.spider.common.request.filter.RecordFilter;
 import com.spider.common.response.CommonPayLoad;
@@ -16,13 +17,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(AppConstants.API_MODULE_MASTER)
-public class ApiModuleMappingMasterController {
+public class ModuleApiMappingMasterController {
 
 
-    private final ApiModuleMappingMasterService service;
+    private final ModuleAPIMappingViewService service;
 
     @Autowired
-    public ApiModuleMappingMasterController(ApiModuleMappingMasterService service) {
+    public ModuleApiMappingMasterController(ModuleAPIMappingViewService service) {
         this.service = service;
     }
 
@@ -43,8 +44,7 @@ public class ApiModuleMappingMasterController {
     public ResponseEntity<CommonPayLoad<CommonResponse>> update(@PathVariable("uuid") String uuid,
                                                                 @Valid @RequestBody ApiModuleMappingMasterRequest apiMasterRequest,
                                                                 @RequestAttribute("userId") String userId,@RequestAttribute("orgId") Long orgId) {
-        CommonPayLoad<CommonResponse> response = service.update(uuid,apiMasterRequest,userId,orgId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        throw  new AuthenticationException("API is not ready yet!");
     }
 
     @DeleteMapping("/{uuid}")
@@ -53,8 +53,8 @@ public class ApiModuleMappingMasterController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")
-    public ResponseEntity<Page<ApiModuleMappingMaster>> filter(@Valid @RequestBody RecordFilter recordFilter) {
-        Page<ApiModuleMappingMaster> filter = service.filter(recordFilter);
+    public ResponseEntity<Page<ModuleAPIMappingView>> filter(@Valid @RequestBody RecordFilter recordFilter) {
+        Page<ModuleAPIMappingView> filter = service.filter(recordFilter);
         return new ResponseEntity<>(filter, HttpStatus.OK);
     }
 

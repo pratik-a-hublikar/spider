@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ComponentScan(basePackages = { "com.spider"})
 @EnableAutoConfiguration
 @EntityScan(basePackages = { "com.spider"})
-//@EnableJpaRepositories(basePackages = { "com.refurb"})
+@EnableJpaRepositories(basePackages = { "com.spider"})
 @RestController
 public class SpiderApplication {
 

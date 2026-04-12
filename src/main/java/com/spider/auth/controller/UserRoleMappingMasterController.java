@@ -1,8 +1,8 @@
 package com.spider.auth.controller;
 
-import com.spider.auth.model.UserRoleMappingMaster;
+import com.spider.auth.model.view.UserRoleMappingView;
 import com.spider.auth.request.UserRoleMappingMasterRequest;
-import com.spider.auth.service.UserRoleMappingMasterService;
+import com.spider.auth.service.UserRoleMappingViewService;
 import com.spider.common.AppConstants;
 import com.spider.common.request.filter.RecordFilter;
 import com.spider.common.response.CommonPayLoad;
@@ -15,13 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(AppConstants.ROLE_USER_MASTER)
+@RequestMapping(AppConstants.USER_ROLE_MASTER)
 public class UserRoleMappingMasterController {
 
-    private final UserRoleMappingMasterService service;
+    private final UserRoleMappingViewService service;
 
     @Autowired
-    public UserRoleMappingMasterController(UserRoleMappingMasterService service) {
+    public UserRoleMappingMasterController(UserRoleMappingViewService service) {
         this.service = service;
     }
 
@@ -57,8 +57,8 @@ public class UserRoleMappingMasterController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @PostMapping("/filter")
-    public ResponseEntity<Page<UserRoleMappingMaster>> filter(@Valid @RequestBody RecordFilter recordFilter) {
-        Page<UserRoleMappingMaster> filter = service.filter(recordFilter);
+    public ResponseEntity<Page<UserRoleMappingView>> filter(@Valid @RequestBody RecordFilter recordFilter) {
+        Page<UserRoleMappingView> filter = service.filter(recordFilter);
         return new ResponseEntity<>(filter, HttpStatus.OK);
     }
 

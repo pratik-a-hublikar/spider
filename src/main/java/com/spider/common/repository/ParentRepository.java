@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public interface ParentRepository<T extends ParentEntity,ID> extends JpaReposito
     default Optional<T> findOneActiveByUUIDOptional(String uuid,Long orgId){
         return Optional.ofNullable(this.findOneByUuidAndOrgIdAndIsActiveAndIsDeleted(uuid,orgId,true,false));
     }
+
 
 
     default List<T> getAllActive(String uuid,Long orgId){

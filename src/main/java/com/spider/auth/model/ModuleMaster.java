@@ -37,13 +37,4 @@ public class ModuleMaster extends ParentEntity {
     @JoinColumn(name = "parent_id",referencedColumnName = "id",updatable = false,insertable = false)
     private List<ModuleMaster> childModules;
 
-    @ManyToMany( fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "m_api_module_mapping",
-            joinColumns = @JoinColumn(name = "api_id"),
-            inverseJoinColumns = @JoinColumn(name = "module_id")
-    )
-    private List<ApiMaster> apiMasterList;
-
-
 }

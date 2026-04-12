@@ -15,6 +15,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Log4j2
 @Service
 public class ApiMasterServiceImpl extends ParentServiceImpl<ApiMaster,Long> implements ApiMasterService {
@@ -86,4 +88,13 @@ public class ApiMasterServiceImpl extends ParentServiceImpl<ApiMaster,Long> impl
     }
 
 
+    @Override
+    public ApiMaster findOneByUriAndMethod(String uri, String method) {
+        Optional<ApiMaster> apiMaster = repository.findOneByUriAndMethod(uri, method);
+        if(apiMaster.isEmpty()){
+            log.error("No API found for the URI: {} and Method: {}",uri,method);
+            throw new ValidationException("No Data found for the API in teh Database");
+        }
+        return apiMaster.get();
+    }
 }

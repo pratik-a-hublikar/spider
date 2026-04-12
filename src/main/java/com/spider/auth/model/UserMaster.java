@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.List;
-
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
@@ -34,12 +32,5 @@ public class UserMaster extends ParentEntity {
     @Column(name = "is_super_admin", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean isSuperAdmin;
 
-    @ManyToMany( fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "m_role_dept_mapping",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "department_id")
-    )
-    private List<RoleMaster> roleMasterList;
 
 }

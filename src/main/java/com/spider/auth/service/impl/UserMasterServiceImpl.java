@@ -6,6 +6,7 @@ import com.spider.auth.model.UserMaster;
 import com.spider.auth.repository.UserMasterRepository;
 import com.spider.auth.request.AuthRequest;
 import com.spider.auth.response.UserMasterResponse;
+import com.spider.auth.service.ApiMasterService;
 import com.spider.auth.service.UserMasterService;
 import com.spider.common.AppConstants;
 import com.spider.common.exception.ValidationException;
@@ -33,17 +34,20 @@ public class UserMasterServiceImpl extends ParentServiceImpl<UserMaster,Long> im
     private final CriteriaUtil<UserMaster> criteriaUtil;
     private final PasswordEncoder passwordEncoder;
 
+    private final ApiMasterService apiMasterService;
     private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public UserMasterServiceImpl(UserMasterRepository repository,
                                  CriteriaUtil<UserMaster> criteriaUtil,
                                  PasswordEncoder passwordEncoder,
-                                 JwtTokenUtil jwtTokenUtil) {
+                                 JwtTokenUtil jwtTokenUtil,
+                                 ApiMasterService apiMasterService) {
         this.repository = repository;
         this.criteriaUtil = criteriaUtil;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.apiMasterService = apiMasterService;
     }
 
     @Override
@@ -69,17 +73,8 @@ public class UserMasterServiceImpl extends ParentServiceImpl<UserMaster,Long> im
         }else if(uri.startsWith("/master")){
             return false;
         }
-        Optional<ApiMaster> first = userMaster.getRoleMasterList().stream()
-                .filter(p -> !CollectionUtils.isEmpty(p.getDepartmentMasters()))
-                .flatMap(p -> p.getDepartmentMasters().stream())
-                .filter(p -> !CollectionUtils.isEmpty(p.getModuleMaster()))
-                .flatMap(p -> p.getModuleMaster().stream())
-                .flatMap(p->p.getApiMasterList().stream())
-                .filter(Objects::nonNull)
-                .filter(p -> p.getPath().equalsIgnoreCase(uri) && method.equalsIgnoreCase(p.getMethod()))
-                .findFirst();
-
-        return first.isPresent();
+        ApiMaster apiInfo = apiMasterService.findOneByUriAndMethod(uri,method);
+        return repository.existsAccessToAPI(userMaster.getId(), apiInfo.getId());
     }
 
     @Override

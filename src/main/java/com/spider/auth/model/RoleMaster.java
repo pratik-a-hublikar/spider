@@ -7,8 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.List;
-
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = false)
@@ -32,13 +30,6 @@ public class RoleMaster extends ParentEntity {
     @Column(name = "org_id")
     private Long orgId;
 
-    @ManyToMany( fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "m_role_dept_mapping",
-            joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "department_id")
-    )
-    private List<DepartmentMaster> departmentMasters;
 
 
 
