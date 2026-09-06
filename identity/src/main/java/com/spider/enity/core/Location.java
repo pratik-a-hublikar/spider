@@ -1,10 +1,8 @@
-package com.spider.dao.enity.core;
+package com.spider.enity.core;
 
 
 import com.spider.common.model.CommonEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,9 +25,12 @@ public class Location extends CommonEntity {
     @Column(name = "location_address")
     private String locationAddress;
 
-    @Column(name = "org_id")
+    @Column(name = "org_id",nullable = false)
     private Long orgId;
 
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "org_id", referencedColumnName = "id",
+            insertable = false, updatable = false)
+    private Organization organization;
 }

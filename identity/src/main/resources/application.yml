@@ -1,0 +1,60 @@
+#POSTGRES_USER: postgress
+#POSTGRES_PASSWORD: postgres
+#POSTGRES_DB: spider
+#POSTGRES_PORT: 5432
+#REDIS_HOST: localhost
+
+REDIS_PORT: 6379
+server:
+  servlet:
+    context-path: /api/v1/identity
+spider:
+  session:
+    # Session timeout in seconds
+    timeout: 3600
+shipmnts:
+  authentication-url: ${SHIPMNTS_AUTHENTICATION_URL:https://auth.api.shipmnts.com/user_management/authenticate}
+  graphql-url: ${SHIPMNTS_GRAPHQL_URL:https://api.shipmnts.com/graphql}
+  client-id: ${SHIPMNTS_CLIENT_ID:client_01J7DZVQXBTQZGGAE5WSYNQYRN}
+  client-secret: ${SHIPMNTS_CLIENT_SECRET:}
+  refresh-token: ${SHIPMNTS_REFRESH_TOKEN:}
+  organization-id: ${SHIPMNTS_ORGANIZATION_ID:}
+  oauth-authorize-url: ${SHIPMNTS_OAUTH_AUTHORIZE_URL:https://auth.shipmnts.com/}
+  oauth-token-url: ${SHIPMNTS_OAUTH_TOKEN_URL:https://auth.api.shipmnts.com/user_management/authenticate}
+  oauth-redirect-uri: ${SHIPMNTS_OAUTH_REDIRECT_URI:http://localhost:5173/auth/callback}
+
+spring:
+  liquibase:
+    enabled: true
+    change-log: db/changelog/changelog-master.xml
+  application:
+    name: spider
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB}?allowPublicKeyRetrieval=true&useSSL=false
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    test-while-idle: true
+    validation-query: SELECT 1
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+jwt:
+  secret: fb1c1e74e7fe4eafbe357427e3ffac947563d55e48054d819a5b860846d1a0bf
+  prefix: Bearer
+  login:
+    ttl: 3600
+  otp:
+    ttl: 300

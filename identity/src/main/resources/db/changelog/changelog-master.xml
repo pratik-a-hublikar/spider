@@ -1,0 +1,21 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <include file="db/changelog/changes/000_initial_master_data.sql"/>
+
+    <include file="db/changelog/changes/001_initial_master_data.sql"/>
+
+    <include file="db/changelog/changes/002_user_organization_link.sql"/>
+
+    <include file="db/changelog/changes/003_add_location_modules.sql"/>
+    <include file="db/changelog/changes/005_organisation_app_type_status_unique.sql"/>
+    <include file="db/changelog/changes/006_role_reporting_role_link.sql"/>
+    <include file="db/changelog/changes/007_location_users.sql"/>
+    <include file="db/changelog/changes/008_user_reporting_user_link.sql"/>
+    <include file="db/changelog/changes/009_add_user_full_name.sql"/>
+    <include file="db/changelog/changes/010_add_sales_performance_module.sql"/>
+    <include file="db/changelog/changes/011_add_shipmnts_fetch_privilege.sql"/>
+
+</databaseChangeLog>

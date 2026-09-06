@@ -1,4 +1,4 @@
-package com.spider.common.utils;
+package com.spider.common.util;
 
 import com.spider.common.enums.Operator;
 import com.spider.common.exception.FilterException;
@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -42,26 +43,26 @@ public class CriteriaUtil<D> {
         Predicate predicate;
         Operator operator = Operator.getOperator(filterCriteria.getOperator());
         if(operator == null){
-            throw new FilterException("Invalid Operator provided");
+            throw new FilterException("filter.invalid.operator");
         }
         predicate = switch (operator) {
-            case CONTAINS -> getContainPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case EQUAL -> getEqualPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case NOT_EQUAL -> getNotEqualPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case IN -> getInPredicate(filterCriteria, dRoot);
-            case GREATER_THAN -> getGreaterThanPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case LESS_THAN -> getLessThanPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case GREATER_THAN_EQUAL -> getGreaterThanEqualsPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case LESS_THAN_EQUAL -> getLessThanEqualsPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case TRUE -> getTruePredicate(filterCriteria, dRoot, criteriaBuilder);
-            case FALSE -> getFalsePredicate(filterCriteria, dRoot, criteriaBuilder);
-            case NULL -> getNullPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case NOT_NULL -> getNotNullPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case CONTAINS_OR_EQUAL -> getContainOrEqualPredicate(filterCriteria, dRoot, criteriaBuilder);
-            case BETWEEN -> getBetweenPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.CONTAINS -> getContainPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.EQUAL -> getEqualPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.NOT_EQUAL -> getNotEqualPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.IN -> getInPredicate(filterCriteria, dRoot);
+            case Operator.GREATER_THAN -> getGreaterThanPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.LESS_THAN -> getLessThanPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.GREATER_THAN_EQUAL -> getGreaterThanEqualsPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.LESS_THAN_EQUAL -> getLessThanEqualsPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.TRUE -> getTruePredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.FALSE -> getFalsePredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.NULL -> getNullPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.NOT_NULL -> getNotNullPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.CONTAINS_OR_EQUAL -> getContainOrEqualPredicate(filterCriteria, dRoot, criteriaBuilder);
+            case Operator.BETWEEN -> getBetweenPredicate(filterCriteria, dRoot, criteriaBuilder);
         };
         if(null == predicate){
-            throw new FilterException("Operator not supported yet");
+            throw new FilterException("filter.operator.unsupported");
         }
         return predicate;
 
@@ -71,10 +72,12 @@ public class CriteriaUtil<D> {
         validateInput(filterCriteria.getValues());
         ArrayList<Predicate> predicates = new ArrayList<>();
         filterCriteria.getValues().forEach(value -> {
-            predicates.add(criteriaBuilder.like(dRoot.get(filterCriteria.getColumn()).as(String.class),getContainsEnd(value)));
-            predicates.add(criteriaBuilder.like(dRoot.get(filterCriteria.getColumn()).as(String.class),getContainsStart(value)));
-            predicates.add(criteriaBuilder.like(dRoot.get(filterCriteria.getColumn()).as(String.class),getContainsMiddle(value)));
-            predicates.add(criteriaBuilder.like(dRoot.get(filterCriteria.getColumn()).as(String.class),value));
+            Expression<String> field = criteriaBuilder.lower(dRoot.get(filterCriteria.getColumn()).as(String.class));
+            String normalizedValue = value.toLowerCase(Locale.ROOT);
+            predicates.add(criteriaBuilder.like(field,getContainsEnd(normalizedValue)));
+            predicates.add(criteriaBuilder.like(field,getContainsStart(normalizedValue)));
+            predicates.add(criteriaBuilder.like(field,getContainsMiddle(normalizedValue)));
+            predicates.add(criteriaBuilder.like(field,normalizedValue));
         });
         return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
     }
@@ -82,7 +85,8 @@ public class CriteriaUtil<D> {
     private Predicate getContainPredicate(FilterCriteria filterCriteria, Root<D> dRoot, CriteriaBuilder criteriaBuilder) {
         validateInput(filterCriteria.getValues());
         List<Predicate> predicateList=new ArrayList<>();
-        filterCriteria.getValues().forEach(value -> predicateList.add(criteriaBuilder.like(dRoot.get(filterCriteria.getColumn()).as(String.class),getContainsValue(value))));
+        Expression<String> field = criteriaBuilder.lower(dRoot.get(filterCriteria.getColumn()).as(String.class));
+        filterCriteria.getValues().forEach(value -> predicateList.add(criteriaBuilder.like(field,getContainsValue(value.toLowerCase(Locale.ROOT)))));
         return criteriaBuilder.or(predicateList.toArray(new Predicate[0]));
     }
 
@@ -147,7 +151,7 @@ public class CriteriaUtil<D> {
         validateInput(filterCriteria.getValues());
         // Expecting two values for the range
         if (filterCriteria.getValues().size() != 2) {
-            throw new FilterException("BETWEEN operator requires exactly two values.");
+            throw new FilterException("filter.between.values");
 
         }
 
@@ -159,12 +163,12 @@ public class CriteriaUtil<D> {
 
     private void validateInput(List<String> values) {
         if(CollectionUtils.isEmpty(values)){
-           throw new FilterException("Values can not be null");
+           throw new FilterException("filter.values.null");
         }
     }
 
     private String getContainsValue(String value) {
-        return "%".concat(value).concat("%");
+        return "%".concat(value.toLowerCase()).concat("%");
     }
 
     private String getContainsMiddle(String value) {
@@ -189,5 +193,3 @@ public class CriteriaUtil<D> {
         }
     }
 }
-
-

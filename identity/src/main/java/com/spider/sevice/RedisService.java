@@ -2,14 +2,18 @@
  * Copyright (c) 2020 RECOBO
  */
 
-package com.spider.common.service.impl;
+package com.spider.sevice;
 
+import com.spider.common.constant.CacheMap;
 import com.spider.common.dto.UserSessionDTO;
+import com.spider.repository.tech.UserRoleLinkRepository;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -19,50 +23,57 @@ public class RedisService {
     private final RMap<Long, Collection<Long>> rolePrivilegeMap;
     private final UserRoleLinkRepository userRoleLinkRepository;
 
-    /**
-     * Instantiates a new Redis service.
-     *
-     * @param redissonClient         the redisson client
-     * @param userRoleLinkRepository the user role link repository
-     */
+
     public RedisService(RedissonClient redissonClient,
                         UserRoleLinkRepository userRoleLinkRepository) {
-        userSessionMap = redissonClient.getMapCache(CacheMap.USER_SESSION_MAP.toString());
-        userSessionIdMap = redissonClient.getMapCache(CacheMap.USER_SESSION_ID_MAP.toString());
+        // V2 isolates sessions written with the old Kryo codec. Typed JSON avoids class-name
+        // metadata in Redis, so application/classloader changes cannot corrupt Date fields.
+        userSessionMap = redissonClient.getMapCache(
+                CacheMap.USER_SESSION_MAP_V2.toString(),
+                new TypedJsonJacksonCodec(String.class, UserSessionDTO.class));
+        userSessionMap.expire(Instant.now().plusSeconds(24 * 60 * 60));
+        userSessionIdMap = redissonClient.getMapCache(CacheMap.USER_SESSION_ID_MAP_V2.toString());
+        userSessionIdMap.expire(Instant.now().plusSeconds(24 * 60 * 60));
         rolePrivilegeMap = redissonClient.getMapCache(CacheMap.PRIVILEGE.toString());
+        rolePrivilegeMap.expire(Instant.now().plusSeconds(24 * 60 * 60));
         this.userRoleLinkRepository = userRoleLinkRepository;
     }
 
-    /**
-     * Gets user session dto.
-     *
-     * @param sessionKey the session key
-     * @return the user session dto
-     */
     public UserSessionDTO getUserSessionDTO(String sessionKey) {
         return userSessionMap.get(sessionKey);
     }
 
-    /**
-     * Gets user session all data.
-     *
-     * @return the user session all data
-     */
     public Collection<UserSessionDTO> getUserSessionAllData() {
         return userSessionMap.values();
     }
 
-    /**
-     * Put user session dto.
-     *
-     * @param userSessionDTO the user session dto
-     * @param isNew          the is new
-     */
+    public Collection<UserSessionDTO> getSessionsOfUser(String sessionKey) {
+        UserSessionDTO currentSession = getUserSessionDTO(sessionKey);
+        if (currentSession == null) {
+            return Collections.emptyList();
+        }
+        return userSessionMap.values().stream()
+                .filter(session -> Objects.equals(session.getUserId(), currentSession.getUserId()))
+                .toList();
+    }
+
+    public void removeAllSessionsOfUser(String sessionKey) {
+        UserSessionDTO currentSession = getUserSessionDTO(sessionKey);
+        if (currentSession == null) {
+            return;
+        }
+        Set<String> sessionKeys = userSessionIdMap.remove(currentSession.getUserId());
+        if (!CollectionUtils.isEmpty(sessionKeys)) {
+            sessionKeys.forEach(userSessionMap::remove);
+        }
+    }
+
     public void putUserSessionDTO(UserSessionDTO userSessionDTO, boolean isNew) {
         userSessionDTO.setLastAccessDate(new Date());
-        userSessionMap.put(userSessionDTO.getEmail(), userSessionDTO);
+        // set entry with 24 hours TTL so sessions expire automatically in Redis
+        userSessionMap.fastPut(userSessionDTO.getUuid(), userSessionDTO);
         if (isNew) {
-            addUserSession(userSessionDTO.getUserId(), userSessionDTO.getEmail());
+            addUserSession(userSessionDTO.getUserId(), userSessionDTO.getUuid());
         }
     }
 
@@ -72,11 +83,12 @@ public class RedisService {
      * @param sessionKey the session key
      */
     public void removeUserSessionDTO(String sessionKey) {
-        UserSessionDTO userSessionDTO = userSessionMap.remove(sessionKey);
+        UserSessionDTO userSessionDTO = getUserSessionDTO(sessionKey);
         if (userSessionDTO == null) {
             return;
         }
-        removeUserSession(userSessionDTO.getUserId(), userSessionDTO.getEmail());
+        userSessionMap.remove(userSessionDTO.getUuid());
+        removeUserSession(userSessionDTO.getUserId(), userSessionDTO.getUuid());
     }
 
     /**
@@ -137,7 +149,7 @@ public class RedisService {
      * @param roleIds the role ids
      * @return the session id map by role id
      */
-    public Map<Long, Set<String>> getSessionIdMapByRoleId(List<Long> roleIds) {
+    public Map<Long, Set<String>> getSessionIdMapByRoleId(Set<Long> roleIds) {
         if (CollectionUtils.isEmpty(roleIds)) {
             return new HashMap<>();
         }

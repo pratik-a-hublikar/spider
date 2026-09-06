@@ -1,4 +1,4 @@
-package com.spider.dao.enity.core;
+package com.spider.enity.core;
 
 import com.spider.common.model.CommonEntity;
 import jakarta.persistence.*;
@@ -9,7 +9,10 @@ import lombok.Setter;
 import org.hibernate.validator.internal.util.stereotypes.Lazy;
 
 @Entity
-@Table(name = "m_organisation")
+@Table(name = "m_organisation",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uq_organisation_app_type_status",
+                columnNames = {"app_type", "is_active", "is_deleted"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +20,7 @@ import org.hibernate.validator.internal.util.stereotypes.Lazy;
 public class Organization extends CommonEntity {
 
 
-    @Column(name = "app_type", unique = true)
+    @Column(name = "app_type")
     private String appName;
 
     @Column(name = "is_super_organization", unique = true)

@@ -1,0 +1,108 @@
+.spm-bar-chart {
+  height: 150px;
+  margin-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 8px;
+}
+
+.spm-chart-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 8px;
+  color: #64748b;
+}
+
+.spm-chart-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 7px;
+  margin-right: 4px;
+  border-radius: 2px;
+}
+
+.spm-chart-legend .actual::before { background: #2e5fa3; }
+.spm-chart-legend .budget::before { background: #cbd5e1; }
+
+.spm-chart-plot {
+  height: 120px;
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 10px 4px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.spm-chart-group {
+  flex: 1;
+  display: grid;
+  grid-template-rows: 1fr 15px;
+  min-width: 0;
+  text-align: center;
+}
+
+.spm-chart-columns {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+}
+
+.spm-chart-columns i,
+.spm-chart-columns b {
+  display: block;
+  width: min(18px, 40%);
+  border-radius: 3px 3px 0 0;
+}
+
+.spm-chart-columns i { background: #2e5fa3; }
+.spm-chart-columns b { background: #cbd5e1; }
+.spm-chart-group small { font-size: 8px; color: #64748b; white-space: nowrap; }
+
+@media print {
+  @page { size: A4; margin: 8mm; }
+
+  html, body, #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body:has(.spm-page) .MuiAppBar-root { display: none !important; }
+
+  body:has(.spm-page) .MuiContainer-root {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .spm-no-print { display: none !important; }
+  .spm-page { margin: 0 !important; padding: 0 !important; background: #fff !important; }
+
+  .spm-mirror {
+    width: 100% !important;
+    max-width: 780px !important;
+    margin: 0 auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .spm-block,
+  .spm-gap,
+  .spm-actions,
+  .spm-signoff,
+  .spm-section-title,
+  .spm-bar-chart,
+  .spm-donut,
+  .spm-trend-bars {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
